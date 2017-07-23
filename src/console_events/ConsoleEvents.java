@@ -19,7 +19,7 @@ public class ConsoleEvents {
 			System.getProperty("java.class.path"),
 			ConsoleEvents.class.getName()
 			);
-
+	
 	static void sleep(long millis) {
 		try {
 			Thread.sleep(millis);
@@ -61,6 +61,7 @@ public class ConsoleEvents {
 				String.format("%s %s %d", JAVA_CMDLINE_BASE, "send_ctrl_c", pid),
 				Kernel32.DETACHED_PROCESS,
 				true);
+		System.out.println("+   Waiting for " + pid + ".");
 		Kernel32.INSTANCE.WaitForSingleObject((HANDLE) pi.hProcess, Kernel32.INFINITE);
 		System.out.println("+   Child process terminated: " + pid);
 		// close handles to avoid resource leaks (zombie processes)
