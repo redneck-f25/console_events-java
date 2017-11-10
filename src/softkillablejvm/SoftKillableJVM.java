@@ -23,7 +23,7 @@ public class SoftKillableJVM {
 	private static boolean isStarted = false;
 	private static boolean isRunning = false;
 	private static int lastError = 0;
-
+	
 	public static void start() {
 		synchronized (INSTANCE) {
 			if (isStarted) {
@@ -42,6 +42,19 @@ public class SoftKillableJVM {
 				new MessagePump();
 			}
 		}.start();
+	}
+	
+	public static boolean start(final Integer waitTimeout) throws InterruptedException {
+		start();
+		synchronized (INSTANCE) {
+			if (waitTimeout == null) {
+				INSTANCE.wait();
+			}
+			else {
+				INSTANCE.wait(waitTimeout);
+			}
+		}
+		return isRunning;
 	}
 
 	public static void setClassName(final String className) {
@@ -90,6 +103,9 @@ public class SoftKillableJVM {
 			switch (uMsg) {
 			case WinUser.WM_CREATE:
 				isRunning = true;
+				synchronized (INSTANCE) {
+					INSTANCE.notify();
+				}
 				return new LRESULT(0);
 			case WinUser.WM_CLOSE:
 				System.exit(SoftKillableJVM.exitStatus);
@@ -156,7 +172,13 @@ public class SoftKillableJVM {
 			}
 		}.start();
 
-		SoftKillableJVM.start();
+		try {
+			if (!SoftKillableJVM.start(null)) {
+				System.out.print("failed");
+			}
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
+		}
 		
 		for (;;) {
 			System.out.print('.');
