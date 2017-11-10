@@ -39,6 +39,7 @@ public class SoftKillableJVM {
 		}
 		new Thread() {
 			public void run() {
+				this.setName(MessagePump.class.getName());
 				new MessagePump();
 			}
 		}.start();
@@ -158,8 +159,9 @@ public class SoftKillableJVM {
 		
 		new Thread() {
 			public void run() {
+				this.setName("Murderer");
 				try {
-					Thread.sleep(5000);
+					Thread.sleep(15000);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
